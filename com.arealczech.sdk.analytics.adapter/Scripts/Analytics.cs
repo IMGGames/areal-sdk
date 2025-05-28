@@ -38,6 +38,12 @@ namespace Areal.SDK {
             }
         }
 
+        public static void LogTutorialSkipped() {
+            foreach (var service in _tutorialServices) {
+                service.LogTutorialSkipped();
+            }
+        }
+
         public static void LogLevelUp(int level) {
             foreach (var service in _levelUpServices) {
                 service.LogLevelUp(level);
