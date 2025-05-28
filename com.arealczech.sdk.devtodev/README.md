@@ -9,6 +9,12 @@ This package provides a wrapper around [DevToDev Analytics](https://github.com/d
 >
 > ¯\\\_(ツ)\_/¯
 
--   Areal SDK Common: `https://github.com/IMGGames/areal-sdk.git?path=/com.arealczech.sdk.common`
--   DevToDev Analytics: `https://github.com/devtodev-analytics/package_Analytics.git`
+-   Areal SDK Common
+    ```
+    https://github.com/IMGGames/areal-sdk.git?path=/com.arealczech.sdk.common
+    ```
+-   DevToDev Analytics
+    ```
+    https://github.com/devtodev-analytics/package_Analytics.git
+    ```
 
