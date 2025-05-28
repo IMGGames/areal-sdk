@@ -3,5 +3,6 @@ namespace Areal.SDK.Common {
         public void LogTutorialStart();
         public void LogTutorialStep(int step);
         public void LogTutorialFinish();
+        public void LogTutorialSkipped();
     }
 }

@@ -27,6 +27,10 @@ namespace Areal.SDK.Common.Debug {
             UnityEngine.Debug.Log($"{Prefix} Tutorial finished");
         }
 
+        public void LogTutorialSkipped() {
+            UnityEngine.Debug.Log($"{Prefix} Tutorial skipped");
+        }
+
         public void LogLevelUp(int level) {
             UnityEngine.Debug.Log($"{Prefix} Level up: {level}");
         }
