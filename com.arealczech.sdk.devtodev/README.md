@@ -5,7 +5,7 @@ This package provides a wrapper around [DevToDev Analytics](https://github.com/d
 ## Dependencies
 
 > [!IMPORTANT]
-> Unfortunately, Unity doesn't support git packages for packages, so you have to install it manually via Package Manager.
+> Unfortunately, Unity doesn't support git packages for packages, so you have to install them manually via Package Manager.
 >
 > ¯\\\_(ツ)\_/¯
 
