@@ -1,0 +1,17 @@
+{
+    "name": "Areal SDK DevToDev",
+    "rootNamespace": "Areal.SDK",
+    "references": [
+        "GUID:586f1e7923d8d436098328028c50d304",
+        "GUID:d5e37fcacdf247142b67d68b95b6aecd"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

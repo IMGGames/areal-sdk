@@ -1,0 +1,16 @@
+{
+    "name": "Areal SDK Analytics Adapter",
+    "rootNamespace": "Areal.SDK",
+    "references": [
+        "GUID:586f1e7923d8d436098328028c50d304"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
