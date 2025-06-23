@@ -1,0 +1,142 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Unity.Services.Core;
+using Unity.Services.Core.Environments;
+using UnityEngine;
+using UnityEngine.Purchasing;
+
+namespace Areal.SDK.IAP {
+    public static class IAPManager {
+        public enum InitializationState {
+            Uninitialized,
+            Initializing,
+            Initialized
+        }
+
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
+        private const string Environment = "development";
+#else
+        private const string Environment = "production";
+#endif
+
+        private const string PlayerPrefsKey = "Areal.SDK.IAP.IAPManager";
+
+        private static readonly StoreListener Listener = new StoreListener(ProcessPurchase, OnInitialized, OnInitializeFailed, OnPurchaseFailed);
+
+        public static InitializationState State { get; private set; } = InitializationState.Uninitialized;
+        private static readonly Dictionary<string, Action<string>> Handlers = new Dictionary<string, Action<string>>();
+
+        public static async Task Initialize(params AbstractPurchaseHandler[] handlers) {
+            if (State != InitializationState.Uninitialized) {
+                Debug.LogError(
+                    $"{nameof(IAPManager)} is {(State == InitializationState.Initialized ? "already initialized" : "already initializing")}");
+            }
+
+            State = InitializationState.Initializing;
+
+            _currentPayload = PlayerPrefs.GetString(PlayerPrefsKey, "");
+
+            try {
+                foreach (var handler in handlers) {
+                    if (Handlers.ContainsKey(handler.Id)) {
+                        throw new ArgumentException($"Duplicate handler with id '{handler.Id}'");
+                    }
+
+                    Handlers[handler.Id] = handler.Handle;
+                }
+
+                switch (UnityServices.State) {
+                    case ServicesInitializationState.Uninitialized:
+                        InitializationOptions options = new InitializationOptions().SetEnvironmentName(Environment);
+                        await UnityServices.InitializeAsync(options);
+                        break;
+                    case ServicesInitializationState.Initializing:
+                        throw new Exception("Cannot initialize while UnityServices are initializing. " +
+                                            "Either initialize IAPManager after UnityServices, or let it initialize services itself.");
+                }
+
+                ConfigurationBuilder builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
+                builder.AddProducts(handlers.Select(e => new ProductDefinition(e.Id, (ProductType)e.GetEntryType())));
+
+                UnityPurchasing.Initialize(Listener, builder);
+            }
+            catch (Exception e) {
+                OnInitializeFailed(e.ToString());
+            }
+        }
+
+        public static bool PurchasingLocked { get; private set; }
+        private static Action _currentCallback;
+        private static string _currentPayload;
+
+        public static void Purchase(string id, string payload = "", Action callback = null) {
+            if (State != InitializationState.Initialized) {
+                throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
+            }
+
+            if (PurchasingLocked) {
+                return;
+            }
+
+            PurchasingLocked = true;
+
+            _currentPayload = payload;
+            PlayerPrefs.SetString(PlayerPrefsKey, payload);
+            _currentCallback = callback;
+
+            _controller.InitiatePurchase(_controller.products.WithID(id));
+        }
+
+        private static PurchaseProcessingResult ProcessPurchase(string id) {
+            Handlers[id](_currentPayload);
+
+            if (_currentCallback != null) {
+                _currentCallback();
+
+                _currentCallback = null;
+                _currentPayload = "";
+                PlayerPrefs.SetString(PlayerPrefsKey, "");
+            }
+
+            PurchasingLocked = false;
+
+            return PurchaseProcessingResult.Complete;
+        }
+
+        public static string GetLocalizedPriceString(string id) {
+            if (State != InitializationState.Initialized) {
+                throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
+            }
+
+            return _controller.products.WithID(id).metadata.localizedPriceString;
+        }
+
+        public static decimal GetLocalizedPrice(string id) {
+            if (State != InitializationState.Initialized) {
+                throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
+            }
+
+            return _controller.products.WithID(id).metadata.localizedPrice;
+        }
+
+        private static void OnPurchaseFailed(string message) {
+            Debug.LogError(message);
+            PurchasingLocked = false;
+        }
+
+        private static IStoreController _controller;
+
+        private static void OnInitialized(IStoreController controller, IExtensionProvider _) {
+            _controller = controller;
+            State = InitializationState.Initialized;
+        }
+
+        private static void OnInitializeFailed(string message) {
+            Handlers.Clear();
+            State = InitializationState.Uninitialized;
+            Debug.LogError("Initialization failed: " + message);
+        }
+    }
+}
