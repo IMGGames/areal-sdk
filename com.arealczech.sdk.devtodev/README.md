@@ -2,6 +2,10 @@
 
 This package provides a wrapper around [DevToDev Analytics](https://github.com/devtodev-analytics/package_Analytics.git).
 
+```
+https://github.com/IMGGames/areal-sdk.git?path=/com.arealczech.sdk.devtodev
+```
+
 ## Dependencies
 
 > [!IMPORTANT]
