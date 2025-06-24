@@ -28,7 +28,7 @@ namespace Areal.SDK.IAP {
         public static InitializationState State { get; private set; } = InitializationState.Uninitialized;
         private static readonly Dictionary<string, Action<string>> Handlers = new Dictionary<string, Action<string>>();
 
-        public static async Task Initialize(params AbstractPurchaseHandler[] handlers) {
+        public static async Task Initialize(params IPurchaseHandler[] handlers) {
             if (State != InitializationState.Uninitialized) {
                 Debug.LogError(
                     $"{nameof(IAPManager)} is {(State == InitializationState.Initialized ? "already initialized" : "already initializing")}");
@@ -40,11 +40,13 @@ namespace Areal.SDK.IAP {
 
             try {
                 foreach (var handler in handlers) {
-                    if (Handlers.ContainsKey(handler.Id)) {
-                        throw new ArgumentException($"Duplicate handler with id '{handler.Id}'");
+                    string id = handler.GetId();
+
+                    if (Handlers.ContainsKey(id)) {
+                        throw new ArgumentException($"Duplicate handler with id '{id}'");
                     }
 
-                    Handlers[handler.Id] = handler.Handle;
+                    Handlers[id] = handler.HandlePurchase;
                 }
 
                 switch (UnityServices.State) {
@@ -58,7 +60,7 @@ namespace Areal.SDK.IAP {
                 }
 
                 ConfigurationBuilder builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
-                builder.AddProducts(handlers.Select(e => new ProductDefinition(e.Id, (ProductType)e.GetEntryType())));
+                builder.AddProducts(handlers.Select(e => new ProductDefinition(e.GetId(), (ProductType)e.GetEntryType())));
 
                 UnityPurchasing.Initialize(Listener, builder);
             }

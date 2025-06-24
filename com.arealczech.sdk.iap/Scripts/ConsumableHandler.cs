@@ -1,13 +1,16 @@
 using System;
 
 namespace Areal.SDK.IAP {
-    public class ConsumableHandler : AbstractPurchaseHandler {
+    public class ConsumableHandler : IPurchaseHandler {
+        private readonly string _id;
         private readonly Action<string> _handler;
 
-        override internal EntryType GetEntryType() => EntryType.Consumable;
-        override internal void Handle(string payload) => _handler(payload);
+        public string GetId() => _id;
+        public EntryType GetEntryType() => EntryType.Consumable;
+        public void HandlePurchase(string payload) => _handler(payload);
 
-        public ConsumableHandler(string id, Action<string> handler) : base(id) {
+        public ConsumableHandler(string id, Action<string> handler) {
+            _id = id;
             _handler = handler;
         }
     }
