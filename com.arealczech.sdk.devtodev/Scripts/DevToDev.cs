@@ -5,6 +5,7 @@ using DevToDev.Analytics;
 
 namespace Areal.SDK {
     public class DevToDev : ITutorialAnalyticsService, ICustomEventAnalyticsService, ILevelUpAnalyticsService {
+        // ReSharper disable UnusedParameter.Local
         public DevToDev(
             string androidAppId = null,
             string iosAppId = null,
@@ -12,6 +13,8 @@ namespace Areal.SDK {
             string winAppId = null,
             string osxAppId = null,
             string uwpAppId = null) {
+            // ReSharper restore UnusedParameter.Local
+            // ReSharper disable once InlineTemporaryVariable
             string token =
 #if UNITY_ANDROID
                 androidAppId;
