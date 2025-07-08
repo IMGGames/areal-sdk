@@ -1,6 +1,6 @@
 {
   "name": "com.arealczech.sdk.iap",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "displayName": "Areal SDK IAP",
   "unity": "2021.3",
   "dependencies": {

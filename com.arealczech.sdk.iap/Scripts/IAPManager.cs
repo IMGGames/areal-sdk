@@ -107,20 +107,12 @@ namespace Areal.SDK.IAP {
             return PurchaseProcessingResult.Complete;
         }
 
-        public static string GetLocalizedPriceString(string id) {
+        public static Product GetProduct(string id) {
             if (State != InitializationState.Initialized) {
                 throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
             }
 
-            return _controller.products.WithID(id).metadata.localizedPriceString;
-        }
-
-        public static decimal GetLocalizedPrice(string id) {
-            if (State != InitializationState.Initialized) {
-                throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
-            }
-
-            return _controller.products.WithID(id).metadata.localizedPrice;
+            return _controller.products.WithID(id);
         }
 
         private static void OnPurchaseFailed(string message) {
