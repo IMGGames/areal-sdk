@@ -7,7 +7,7 @@ namespace Areal.SDK.IAP {
 
         public string GetId() => _id;
         public EntryType GetEntryType() => EntryType.Consumable;
-        public void HandlePurchase(string payload) => _handler(payload);
+        public void HandlePurchase(string payload) => _handler?.Invoke(payload);
 
         public ConsumableHandler(string id, Action<string> handler) {
             _id = id;

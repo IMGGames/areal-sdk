@@ -11,7 +11,7 @@ namespace Areal.SDK.IAP {
 
         public NonConsumableHandler(string id, Action handler) {
             _id = id;
-            _handler = handler;
+            _handler = handler ?? throw new ArgumentNullException(nameof(handler));
         }
     }
 }
