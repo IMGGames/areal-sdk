@@ -21,8 +21,6 @@ namespace Areal.SDK.IAP {
         private const string Environment = "production";
 #endif
 
-        private const string PlayerPrefsKey = "Areal.SDK.IAP.IAPManager";
-
         private static readonly StoreListener Listener = new StoreListener(ProcessPurchase, OnInitialized, OnInitializeFailed, OnPurchaseFailed);
 
         public static InitializationState State { get; private set; } = InitializationState.Uninitialized;
@@ -36,7 +34,7 @@ namespace Areal.SDK.IAP {
 
             State = InitializationState.Initializing;
 
-            _currentPayload = PlayerPrefs.GetString(PlayerPrefsKey, "");
+            PayloadProvider.Load();
 
             try {
                 foreach (var handler in handlers) {
@@ -69,40 +67,28 @@ namespace Areal.SDK.IAP {
             }
         }
 
-        public static bool PurchasingLocked { get; private set; }
-        private static Action<PurchaseResult> _currentCallback;
-        private static string _currentPayload;
+        private static readonly Dictionary<string, Action<PurchaseResult>> CurrentCallbacks = new Dictionary<string, Action<PurchaseResult>>();
 
         public static void Purchase(string id, string payload = "", Action<PurchaseResult> callback = null) {
             if (State != InitializationState.Initialized) {
                 throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
             }
 
-            if (PurchasingLocked) {
-                return;
-            }
-
-            PurchasingLocked = true;
-
-            _currentPayload = payload;
-            PlayerPrefs.SetString(PlayerPrefsKey, payload);
-            _currentCallback = callback;
+            PayloadProvider.Set(id, payload);
+            CurrentCallbacks[id] = callback;
 
             _controller.InitiatePurchase(_controller.products.WithID(id));
         }
 
         private static PurchaseProcessingResult ProcessPurchase(string id) {
-            Handlers[id](_currentPayload);
+            Handlers[id](PayloadProvider.Get(id));
 
-            if (_currentCallback != null) {
-                _currentCallback(PurchaseResult.Succeeded);
+            PayloadProvider.Remove(id);
 
-                _currentCallback = null;
-                _currentPayload = "";
-                PlayerPrefs.SetString(PlayerPrefsKey, "");
+            if (CurrentCallbacks.TryGetValue(id, out var callback)) {
+                callback?.Invoke(PurchaseResult.Succeeded);
+                CurrentCallbacks.Remove(id);
             }
-
-            PurchasingLocked = false;
 
             return PurchaseProcessingResult.Complete;
         }
@@ -129,9 +115,13 @@ namespace Areal.SDK.IAP {
             });
         }
 
-        private static void OnPurchaseFailed(string message) {
-            Debug.LogError(message);
-            PurchasingLocked = false;
+        private static void OnPurchaseFailed(Product product, string message) {
+            string id = product.definition.id;
+
+            PayloadProvider.Remove(id);
+            CurrentCallbacks.Remove(id);
+
+            Debug.LogError($"Purchasing {id} failed: {message}");
         }
 
         private static IStoreController _controller;
