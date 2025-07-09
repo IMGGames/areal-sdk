@@ -115,17 +115,17 @@ namespace Areal.SDK.IAP {
             return _controller.products.WithID(id);
         }
 
-        public static void RestorePurchases(Action<bool> callback) {
+        public static void RestorePurchases(Action<bool> callback = null) {
             if (State != InitializationState.Initialized) {
                 throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
             }
-            
-            _extensions.GetExtension<IAppleExtensions> ().RestoreTransactions ((result, message) => {
+
+            _extensions.GetExtension<IAppleExtensions>().RestoreTransactions((result, message) => {
                 if (!result) {
                     Debug.LogError($"Failed to restore purchases: {message}");
                 }
 
-                callback(result);
+                callback?.Invoke(result);
             });
         }
 
