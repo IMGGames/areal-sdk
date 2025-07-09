@@ -26,6 +26,8 @@ namespace Areal.SDK.IAP {
         public static InitializationState State { get; private set; } = InitializationState.Uninitialized;
         private static readonly Dictionary<string, Action<string>> Handlers = new Dictionary<string, Action<string>>();
 
+        public static event Action<Product> OnPurchaseSucceeded;
+
         public static async Task Initialize(params IPurchaseHandler[] handlers) {
             if (State != InitializationState.Uninitialized) {
                 Debug.LogError(
@@ -80,7 +82,9 @@ namespace Areal.SDK.IAP {
             _controller.InitiatePurchase(_controller.products.WithID(id));
         }
 
-        private static PurchaseProcessingResult ProcessPurchase(string id) {
+        private static PurchaseProcessingResult ProcessPurchase(Product product) {
+            string id = product.definition.id;
+
             Handlers[id](PayloadProvider.Get(id));
 
             PayloadProvider.Remove(id);
@@ -89,6 +93,8 @@ namespace Areal.SDK.IAP {
                 callback?.Invoke(PurchaseResult.Succeeded);
                 CurrentCallbacks.Remove(id);
             }
+
+            OnPurchaseSucceeded?.Invoke(product);
 
             return PurchaseProcessingResult.Complete;
         }

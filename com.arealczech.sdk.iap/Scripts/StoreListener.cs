@@ -4,7 +4,7 @@ using UnityEngine.Purchasing.Extension;
 
 namespace Areal.SDK.IAP {
     internal class StoreListener : IDetailedStoreListener {
-        internal delegate PurchaseProcessingResult PurchaseProcessor(string id);
+        internal delegate PurchaseProcessingResult PurchaseProcessor(Product product);
 
         private readonly PurchaseProcessor _processor;
         private readonly Action<IStoreController, IExtensionProvider> _onInitialized;
@@ -16,7 +16,7 @@ namespace Areal.SDK.IAP {
 
         public void OnInitialized(IStoreController controller, IExtensionProvider extensions) => _onInitialized(controller, extensions);
 
-        public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs purchaseEvent) => _processor(purchaseEvent.purchasedProduct.definition.id);
+        public PurchaseProcessingResult ProcessPurchase(PurchaseEventArgs purchaseArgs) => _processor(purchaseArgs.purchasedProduct);
 
         public void OnPurchaseFailed(Product product, PurchaseFailureReason failureReason) =>
             _onPurchaseFailed(product, failureReason.ToString());
