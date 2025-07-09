@@ -70,10 +70,10 @@ namespace Areal.SDK.IAP {
         }
 
         public static bool PurchasingLocked { get; private set; }
-        private static Action _currentCallback;
+        private static Action<PurchaseResult> _currentCallback;
         private static string _currentPayload;
 
-        public static void Purchase(string id, string payload = "", Action callback = null) {
+        public static void Purchase(string id, string payload = "", Action<PurchaseResult> callback = null) {
             if (State != InitializationState.Initialized) {
                 throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
             }
@@ -95,7 +95,7 @@ namespace Areal.SDK.IAP {
             Handlers[id](_currentPayload);
 
             if (_currentCallback != null) {
-                _currentCallback();
+                _currentCallback(PurchaseResult.Succeeded);
 
                 _currentCallback = null;
                 _currentPayload = "";
@@ -115,15 +115,31 @@ namespace Areal.SDK.IAP {
             return _controller.products.WithID(id);
         }
 
+        public static void RestorePurchases(Action<bool> callback) {
+            if (State != InitializationState.Initialized) {
+                throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
+            }
+            
+            _extensions.GetExtension<IAppleExtensions> ().RestoreTransactions ((result, message) => {
+                if (!result) {
+                    Debug.LogError($"Failed to restore purchases: {message}");
+                }
+
+                callback(result);
+            });
+        }
+
         private static void OnPurchaseFailed(string message) {
             Debug.LogError(message);
             PurchasingLocked = false;
         }
 
         private static IStoreController _controller;
+        private static IExtensionProvider _extensions;
 
-        private static void OnInitialized(IStoreController controller, IExtensionProvider _) {
+        private static void OnInitialized(IStoreController controller, IExtensionProvider extensions) {
             _controller = controller;
+            _extensions = extensions;
             State = InitializationState.Initialized;
         }
 
