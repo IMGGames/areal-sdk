@@ -138,7 +138,7 @@ namespace Areal.SDK.IAP {
                 IEnumerator Enumerator() {
                     float t = 2;
                     while (t >= 0) {
-                        text.text = $"Pulling unfinished transactions in {t:F3}s";
+                        text.text = $"Pulling unconfirmed transactions in {t:F3}s";
                         t -= Time.unscaledDeltaTime;
                         yield return null;
                     }
@@ -147,7 +147,7 @@ namespace Areal.SDK.IAP {
 
                     callback(transactions);
 
-                    text.text = $"Pulling {transactions.Length} unfinished transactions done.";
+                    text.text = $"Pulling {transactions.Length} unconfirmed transactions done.";
                 }
             });
         }

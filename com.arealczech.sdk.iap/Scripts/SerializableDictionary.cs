@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Areal.SDK.IAP {
     [Serializable]
-    internal class SerializableDictionary<TKey, TValue> {
+    internal class SerializableDictionary<TKey, TValue>: IEnumerable<TKey> {
         // minimizing field names to make json tiny
 
         [SerializeField] private List<Entry> e = new List<Entry>();
@@ -50,16 +52,20 @@ namespace Areal.SDK.IAP {
             return false;
         }
 
-        internal void Clean() {
-            e.Clear();
-        }
-
         private static bool Compare<T>(T a, T b) => EqualityComparer<T>.Default.Equals(a, b);
 
         [Serializable]
         private class Entry {
             [SerializeField] internal TKey k;
             [SerializeField] internal TValue v;
+        }
+
+        public IEnumerator<TKey> GetEnumerator() {
+            return e.Select(entry => entry.k).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
         }
     }
 }

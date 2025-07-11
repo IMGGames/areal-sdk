@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Areal.SDK.IAP {
@@ -39,8 +40,15 @@ namespace Areal.SDK.IAP {
 
         public static bool Contains(string productId) => _dictionary.Contains(productId);
 
-        public static void Clean() {
-            _dictionary.Clean();
+        public static void CleanNotPresent(string[] keys) {
+            foreach (var key in _dictionary) {
+                if (keys.Contains(key)) {
+                    continue;
+                }
+
+                _dictionary.Remove(key);
+            }
+
             Save();
         }
 

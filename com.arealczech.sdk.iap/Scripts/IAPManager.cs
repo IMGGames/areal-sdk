@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Areal.SDK.IAP {
@@ -48,7 +49,8 @@ namespace Areal.SDK.IAP {
                     foreach (var transaction in transactions) {
                         ProcessTransaction(transaction);
                     }
-                    PayloadProvider.Clean();
+
+                    PayloadProvider.CleanNotPresent(transactions.Select(e => e.GetProductId()).ToArray());
                     // todo: set status = done
                 });
             }, ProcessTransaction, OnTransactionFail);
@@ -63,6 +65,9 @@ namespace Areal.SDK.IAP {
 
             try {
                 result = PurchaseHandlers[productId].HandlePurchase(PayloadProvider.Get(productId));
+                if (result == PurchaseResult.Failed) {
+                    Debug.LogWarning($"Processing purchase '{productId}' failed");
+                }
             }
             catch (Exception e) {
                 Debug.LogError("Exception while processing purchase: " + e);
