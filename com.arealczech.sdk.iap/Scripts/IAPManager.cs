@@ -1,148 +1,112 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Unity.Services.Core;
-using Unity.Services.Core.Environments;
 using UnityEngine;
-using UnityEngine.Purchasing;
 
 namespace Areal.SDK.IAP {
     public static class IAPManager {
+        [Flags]
         public enum InitializationState {
-            Uninitialized,
-            Initializing,
-            Initialized
+            Uninitialized = 0,
+            StoreInitializeCalled = 1 << 0,
+            StoreInitialized = 1 << 1,
+            ManagerInitializeCalled = 1 << 2,
+            ManagerInitialized = 1 << 3,
+            Initialized = StoreInitializeCalled | StoreInitialized | ManagerInitialized,
         }
 
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-        private const string Environment = "development";
-#else
-        private const string Environment = "production";
+        public static InitializationState State { get; private set; } = InitializationState.Uninitialized;
+
+        private static readonly AbstractStoreImplementation Store =
+#if UNITY_EDITOR
+            new FakeStore();
+#elif UNITY_IOS
+            new AppStoreImplementation();
 #endif
 
-        private static readonly StoreListener Listener = new StoreListener(ProcessPurchase, OnInitialized, OnInitializeFailed, OnPurchaseFailed);
+        private static readonly Dictionary<string, Action<PurchaseResult>> LocalCallbacks = new();
+        internal static readonly Dictionary<string, IPurchaseHandler> PurchaseHandlers = new();
 
-        public static InitializationState State { get; private set; } = InitializationState.Uninitialized;
-        private static readonly Dictionary<string, Action<string>> Handlers = new Dictionary<string, Action<string>>();
-
-        public static event Action<Product> OnPurchaseSucceeded;
-
-        public static async Task Initialize(params IPurchaseHandler[] handlers) {
-            if (State != InitializationState.Uninitialized) {
-                Debug.LogError(
-                    $"{nameof(IAPManager)} is {(State == InitializationState.Initialized ? "already initialized" : "already initializing")}");
-            }
-
-            State = InitializationState.Initializing;
-
+        public static void Initialize(params IPurchaseHandler[] handlers) {
             PayloadProvider.Load();
 
             try {
-                foreach (var handler in handlers) {
-                    string id = handler.GetId();
+                foreach (IPurchaseHandler handler in handlers) {
+                    string id = handler.GetProductId();
 
-                    if (Handlers.ContainsKey(id)) {
-                        throw new ArgumentException($"Duplicate handler with id '{id}'");
+                    if (!PurchaseHandlers.TryAdd(id, handler)) {
+                        throw new ArgumentException($"Duplicate handler '{id}'.");
                     }
-
-                    Handlers[id] = handler.HandlePurchase;
                 }
+            }
+            catch {
+                PurchaseHandlers.Clear();
+                throw;
+            }
 
-                switch (UnityServices.State) {
-                    case ServicesInitializationState.Uninitialized:
-                        InitializationOptions options = new InitializationOptions().SetEnvironmentName(Environment);
-                        await UnityServices.InitializeAsync(options);
-                        break;
-                    case ServicesInitializationState.Initializing:
-                        throw new Exception("Cannot initialize while UnityServices are initializing. " +
-                                            "Either initialize IAPManager after UnityServices, or let it initialize services itself.");
-                }
+            Store.Initialize(() => {
+                Store.PullUnconfirmedTransactions(transactions => {
+                    foreach (var transaction in transactions) {
+                        ProcessTransaction(transaction);
+                    }
+                    PayloadProvider.Clean();
+                    // todo: set status = done
+                });
+            }, ProcessTransaction, OnTransactionFail);
 
-                ConfigurationBuilder builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
-                builder.AddProducts(handlers.Select(e => new ProductDefinition(e.GetId(), (ProductType)e.GetEntryType())));
+            // todo: set & check initialized status
+        }
 
-                UnityPurchasing.Initialize(Listener, builder);
+        private static void ProcessTransaction(ITransaction transaction) {
+            string productId = transaction.GetProductId();
+
+            PurchaseResult result = PurchaseResult.Failed;
+
+            try {
+                result = PurchaseHandlers[productId].HandlePurchase(PayloadProvider.Get(productId));
             }
             catch (Exception e) {
-                OnInitializeFailed(e.ToString());
+                Debug.LogError("Failed to process purchase: " + e);
+            }
+
+            try {
+                if (LocalCallbacks.TryGetValue(productId, out var callback)) {
+                    callback?.Invoke(result);
+                }
+            }
+            catch (Exception e) {
+                Debug.LogError("Failed to invoke local callback: " + e);
+            }
+
+            LocalCallbacks.Remove(productId);
+            if (result == PurchaseResult.Succeeded) {
+                PayloadProvider.Remove(productId);
+                Store.ConfirmTransaction(transaction);
             }
         }
 
-        private static readonly Dictionary<string, Action<PurchaseResult>> CurrentCallbacks = new Dictionary<string, Action<PurchaseResult>>();
-
-        public static void Purchase(string id, string payload = "", Action<PurchaseResult> callback = null) {
-            if (State != InitializationState.Initialized) {
-                throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
-            }
-
-            PayloadProvider.Set(id, payload);
-            CurrentCallbacks[id] = callback;
-
-            _controller.InitiatePurchase(_controller.products.WithID(id));
+        private static void OnTransactionFail(string productId) {
+            LocalCallbacks.Remove(productId);
+            PayloadProvider.Remove(productId);
         }
 
-        private static PurchaseProcessingResult ProcessPurchase(Product product) {
-            string id = product.definition.id;
-
-            Handlers[id](PayloadProvider.Get(id));
-
-            PayloadProvider.Remove(id);
-
-            if (CurrentCallbacks.TryGetValue(id, out var callback)) {
-                callback?.Invoke(PurchaseResult.Succeeded);
-                CurrentCallbacks.Remove(id);
-            }
-
-            OnPurchaseSucceeded?.Invoke(product);
-
-            return PurchaseProcessingResult.Complete;
-        }
-
-        public static Product GetProduct(string id) {
-            if (State != InitializationState.Initialized) {
-                throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
-            }
-
-            return _controller.products.WithID(id);
-        }
-
-        public static void RestorePurchases(Action<bool> callback = null) {
-            if (State != InitializationState.Initialized) {
-                throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
-            }
-
-            _extensions.GetExtension<IAppleExtensions>().RestoreTransactions((result, message) => {
-                if (!result) {
-                    Debug.LogError($"Failed to restore purchases: {message}");
+        public static void Purchase(string productId, string payload = null, Action<PurchaseResult> callback = null) {
+            // Disallow concurrent purchases with the same productId.
+            if (PayloadProvider.Contains(productId)) {
+                try {
+                    callback?.Invoke(PurchaseResult.Failed);
+                }
+                catch (Exception e) {
+                    Debug.LogException(e);
                 }
 
-                callback?.Invoke(result);
-            });
+                return;
+            }
+
+            PayloadProvider.Set(productId, payload);
+            LocalCallbacks[productId] = callback;
+            Store.Purchase(productId);
         }
 
-        private static void OnPurchaseFailed(Product product, string message) {
-            string id = product.definition.id;
-
-            PayloadProvider.Remove(id);
-            CurrentCallbacks.Remove(id);
-
-            Debug.LogError($"Purchasing {id} failed: {message}");
-        }
-
-        private static IStoreController _controller;
-        private static IExtensionProvider _extensions;
-
-        private static void OnInitialized(IStoreController controller, IExtensionProvider extensions) {
-            _controller = controller;
-            _extensions = extensions;
-            State = InitializationState.Initialized;
-        }
-
-        private static void OnInitializeFailed(string message) {
-            Handlers.Clear();
-            State = InitializationState.Uninitialized;
-            Debug.LogError("Initialization failed: " + message);
-        }
+        public static void RestorePurchases() => Store.RestorePurchases();
     }
 }

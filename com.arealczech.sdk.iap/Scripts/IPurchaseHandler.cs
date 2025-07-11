@@ -1,7 +1,7 @@
 namespace Areal.SDK.IAP {
     public interface IPurchaseHandler {
-        public string GetId();
+        public string GetProductId();
         public EntryType GetEntryType();
-        public void HandlePurchase(string payload);
+        public PurchaseResult HandlePurchase(string payload);
     }
 }

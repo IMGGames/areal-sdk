@@ -1,15 +1,15 @@
-using System;
-
 namespace Areal.SDK.IAP {
     public class ConsumableHandler : IPurchaseHandler {
+        public delegate PurchaseResult PurchaseHandlerDelegate(string payload);
+
         private readonly string _id;
-        private readonly Action<string> _handler;
+        private readonly PurchaseHandlerDelegate _handler;
 
-        public string GetId() => _id;
+        public string GetProductId() => _id;
         public EntryType GetEntryType() => EntryType.Consumable;
-        public void HandlePurchase(string payload) => _handler?.Invoke(payload);
+        public PurchaseResult HandlePurchase(string payload) => _handler?.Invoke(payload) ?? PurchaseResult.Succeeded;
 
-        public ConsumableHandler(string id, Action<string> handler) {
+        public ConsumableHandler(string id, PurchaseHandlerDelegate handler) {
             _id = id;
             _handler = handler;
         }

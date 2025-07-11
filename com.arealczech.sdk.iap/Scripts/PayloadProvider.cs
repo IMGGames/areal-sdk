@@ -30,12 +30,17 @@ namespace Areal.SDK.IAP {
             Save();
         }
 
-        internal static string Get(string id) {
-            return _dictionary[id];
-        }
+        internal static string Get(string id) => _dictionary[id];
 
         internal static void Remove(string id) {
             _dictionary.Remove(id);
+            Save();
+        }
+        
+        public static bool Contains(string productId) => _dictionary.Contains(productId);
+        
+        public static void Clean() {
+            _dictionary.Clean();
             Save();
         }
 

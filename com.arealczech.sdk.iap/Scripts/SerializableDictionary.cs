@@ -40,6 +40,20 @@ namespace Areal.SDK.IAP {
             return false;
         }
 
+        internal bool Contains(TKey key) {
+            foreach (Entry entry in e) {
+                if (Compare(entry.k, key)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal void Clean() {
+            e.Clear();
+        }
+
         private static bool Compare<T>(T a, T b) => EqualityComparer<T>.Default.Equals(a, b);
 
         [Serializable]
