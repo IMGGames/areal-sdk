@@ -45,7 +45,7 @@ namespace Areal.SDK.IAP {
                 throw;
             }
 
-            Store.Initialize(() => {
+            Store.Initialize(ProcessTransaction, OnTransactionFail, () => {
                 Store.PullUnconfirmedTransactions(transactions => {
                     foreach (var transaction in transactions) {
                         ProcessTransaction(transaction);
@@ -54,7 +54,7 @@ namespace Areal.SDK.IAP {
                     PayloadProvider.CleanNotPresent(transactions.Select(e => e.GetProductId()).ToArray());
                     // todo: set status = done
                 });
-            }, ProcessTransaction, OnTransactionFail);
+            });
 
             // todo: set & check initialized status
         }

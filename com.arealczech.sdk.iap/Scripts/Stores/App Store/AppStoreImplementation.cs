@@ -2,7 +2,7 @@ using System;
 
 namespace Areal.SDK.IAP.Stores {
     internal class AppStoreImplementation : AbstractStoreImplementation {
-        internal override void Initialize(Action callback, Action<ITransaction> transactionProcessor, Action<string> onTransactionFail) {
+        internal override void Initialize(Action<ITransaction> transactionProcessor, Action<string> onTransactionFail, Action callback) {
             throw new NotImplementedException();
         }
 

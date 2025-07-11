@@ -16,7 +16,7 @@ namespace Areal.SDK.IAP.Stores {
         private static Action<ITransaction> _transactionProcessor;
         private static Action<string> _onTransactionFail;
 
-        internal override void Initialize(Action callback, Action<ITransaction> transactionProcessor, Action<string> onTransactionFail) {
+        internal override void Initialize(Action<ITransaction> transactionProcessor, Action<string> onTransactionFail, Action callback) {
             _transactionProcessor = transactionProcessor;
             _onTransactionFail = onTransactionFail;
 
