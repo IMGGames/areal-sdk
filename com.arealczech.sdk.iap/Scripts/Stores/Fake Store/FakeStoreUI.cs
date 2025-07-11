@@ -4,7 +4,7 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Areal.SDK.IAP {
+namespace Areal.SDK.IAP.Stores {
     internal class FakeStoreUI : MonoBehaviour {
         [Header("Confirmation")]
         [SerializeField] private GameObject canvas;
