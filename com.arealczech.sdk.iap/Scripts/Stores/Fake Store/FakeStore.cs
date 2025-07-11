@@ -5,8 +5,8 @@ using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace Areal.SDK.IAP {
-    public class FakeStore : AbstractStoreImplementation {
+namespace Areal.SDK.IAP.Stores {
+    internal class FakeStore : AbstractStoreImplementation {
         private const string PlayerPrefsKey = "Areal.SDK.IAP.FakeStore";
 
         private static SaveData _data;

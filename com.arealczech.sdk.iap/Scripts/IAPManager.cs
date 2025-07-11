@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Areal.SDK.IAP.Stores;
 using UnityEngine;
 
 namespace Areal.SDK.IAP {

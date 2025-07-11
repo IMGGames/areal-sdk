@@ -1,7 +1,7 @@
 using System;
 
-namespace Areal.SDK.IAP {
-    public abstract class AbstractStoreImplementation {
+namespace Areal.SDK.IAP.Stores {
+    internal abstract class AbstractStoreImplementation {
         internal abstract void Initialize(Action callback, Action<ITransaction> transactionProcessor, Action<string> onTransactionFail);
         internal abstract void Purchase(string productId);
         internal abstract void ConfirmTransaction(ITransaction transaction);
