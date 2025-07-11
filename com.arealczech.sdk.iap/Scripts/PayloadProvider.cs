@@ -36,16 +36,14 @@ namespace Areal.SDK.IAP {
             _dictionary.Remove(id);
             Save();
         }
-        
+
         public static bool Contains(string productId) => _dictionary.Contains(productId);
-        
+
         public static void Clean() {
             _dictionary.Clean();
             Save();
         }
 
-        private static void Save() {
-            PlayerPrefs.SetString(PlayerPrefsKey, JsonUtility.ToJson(_dictionary));
-        }
+        private static void Save() => PlayerPrefs.SetString(PlayerPrefsKey, JsonUtility.ToJson(_dictionary));
     }
 }

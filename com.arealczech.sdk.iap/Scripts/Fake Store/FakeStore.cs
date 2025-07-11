@@ -22,7 +22,6 @@ namespace Areal.SDK.IAP {
 
             if (PlayerPrefs.HasKey(PlayerPrefsKey)) {
                 _data = JsonUtility.FromJson<SaveData>(PlayerPrefs.GetString(PlayerPrefsKey));
-                Save();
             }
             else {
                 _data = new SaveData();
@@ -34,8 +33,20 @@ namespace Areal.SDK.IAP {
             callback();
         }
 
+        private readonly Queue<string> _purchaseQueue = new Queue<string>();
+
         internal override void Purchase(string productId) {
+            _purchaseQueue.Enqueue(productId);
+            if (_purchaseQueue.Count > 1) {
+                return;
+            }
+
             _ui.Show("Purchase\n" + productId, (ok, delay) => {
+                _purchaseQueue.Dequeue();
+                if (_purchaseQueue.Count > 0) {
+                    Purchase(_purchaseQueue.Dequeue());
+                }
+                    
                 _ui.ShowNotification(text => {
                     return Enumerator();
 
@@ -90,10 +101,7 @@ namespace Areal.SDK.IAP {
             Debug.Log($"Transaction {fakeTransaction.uuid} confirmed");
         }
 
-        private static void Save() {
-            PlayerPrefs.SetString(PlayerPrefsKey, JsonUtility.ToJson(_data));
-            Debug.Log(PlayerPrefs.GetString(PlayerPrefsKey));
-        }
+        private static void Save() => PlayerPrefs.SetString(PlayerPrefsKey, JsonUtility.ToJson(_data));
 
         internal override void RestorePurchases() {
             _ui.Show("Restore purchases", (ok, delay) => {

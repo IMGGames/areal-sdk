@@ -65,7 +65,7 @@ namespace Areal.SDK.IAP {
                 result = PurchaseHandlers[productId].HandlePurchase(PayloadProvider.Get(productId));
             }
             catch (Exception e) {
-                Debug.LogError("Failed to process purchase: " + e);
+                Debug.LogError("Exception while processing purchase: " + e);
             }
 
             try {
@@ -74,7 +74,7 @@ namespace Areal.SDK.IAP {
                 }
             }
             catch (Exception e) {
-                Debug.LogError("Failed to invoke local callback: " + e);
+                Debug.LogError("Exception while invoking local callback: " + e);
             }
 
             LocalCallbacks.Remove(productId);
