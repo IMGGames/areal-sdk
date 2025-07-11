@@ -46,7 +46,7 @@ namespace Areal.SDK.IAP {
                 if (_purchaseQueue.Count > 0) {
                     Purchase(_purchaseQueue.Dequeue());
                 }
-                    
+
                 _ui.ShowNotification(text => {
                     return Enumerator();
 
@@ -103,7 +103,7 @@ namespace Areal.SDK.IAP {
 
         private static void Save() => PlayerPrefs.SetString(PlayerPrefsKey, JsonUtility.ToJson(_data));
 
-        internal override void RestorePurchases() {
+        internal override void RestorePurchases(Action<RestoreResult> callback = null) {
             _ui.Show("Restore purchases", (ok, delay) => {
                 _ui.ShowNotification(text => {
                     return Enumerator();
@@ -121,9 +121,13 @@ namespace Areal.SDK.IAP {
                                 _transactionProcessor(transaction);
                             }
 
+                            callback?.Invoke(RestoreResult.Succeeded);
+
                             text.text = $"Restoring purchases <color=\"lime\">succeeded</color>, {_data.boughtNonConsumables.Count} transactions";
                         }
                         else {
+                            callback?.Invoke(RestoreResult.Failed);
+
                             text.text = "Restoring purchases <color=\"red\">failed</color>";
                         }
                     }

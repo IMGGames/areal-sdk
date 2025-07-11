@@ -112,6 +112,6 @@ namespace Areal.SDK.IAP {
             Store.Purchase(productId);
         }
 
-        public static void RestorePurchases() => Store.RestorePurchases();
+        public static void RestorePurchases(Action<RestoreResult> callback = null) => Store.RestorePurchases();
     }
 }

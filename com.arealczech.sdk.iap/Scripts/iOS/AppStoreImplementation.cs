@@ -14,7 +14,7 @@ namespace Areal.SDK.IAP {
             throw new NotImplementedException();
         }
 
-        internal override void RestorePurchases() {
+        internal override void RestorePurchases(Action<RestoreResult> callback = null) {
             throw new NotImplementedException();
         }
 
