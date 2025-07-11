@@ -6,7 +6,7 @@ namespace Areal.SDK.IAP {
         private readonly Action _handler;
 
         public string GetId() => _id;
-        public EntryType GetEntryType() => EntryType.Consumable;
+        public EntryType GetEntryType() => EntryType.NonConsumable;
         public void HandlePurchase(string _) => _handler();
 
         public NonConsumableHandler(string id, Action handler) {
