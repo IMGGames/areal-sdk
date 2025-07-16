@@ -21,12 +21,13 @@ namespace Areal.SDK.IAP {
         private const string Environment = "production";
 #endif
 
-        private static readonly StoreListener Listener = new StoreListener(ProcessPurchase, OnInitialized, OnInitializeFailed, OnPurchaseFailed);
+        private static readonly StoreListener Listener = new StoreListener(ProcessPurchase, OnInitializeSucceeded, OnInitializeFailed, OnPurchaseFailed);
 
         public static InitializationState State { get; private set; } = InitializationState.Uninitialized;
         private static readonly Dictionary<string, Action<string>> Handlers = new Dictionary<string, Action<string>>();
 
         public static event Action<Product> OnPurchaseSucceeded;
+        public static event Action OnInitialized;
 
         public static async Task Initialize(params IPurchaseHandler[] handlers) {
             if (State != InitializationState.Uninitialized) {
@@ -133,10 +134,11 @@ namespace Areal.SDK.IAP {
         private static IStoreController _controller;
         private static IExtensionProvider _extensions;
 
-        private static void OnInitialized(IStoreController controller, IExtensionProvider extensions) {
+        private static void OnInitializeSucceeded(IStoreController controller, IExtensionProvider extensions) {
             _controller = controller;
             _extensions = extensions;
             State = InitializationState.Initialized;
+            OnInitialized?.Invoke();
         }
 
         private static void OnInitializeFailed(string message) {
