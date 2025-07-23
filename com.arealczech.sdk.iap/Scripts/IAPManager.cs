@@ -33,6 +33,7 @@ namespace Areal.SDK.IAP {
             if (State != InitializationState.Uninitialized) {
                 Debug.LogError(
                     $"{nameof(IAPManager)} is {(State == InitializationState.Initialized ? "already initialized" : "already initializing")}");
+                return;
             }
 
             State = InitializationState.Initializing;
