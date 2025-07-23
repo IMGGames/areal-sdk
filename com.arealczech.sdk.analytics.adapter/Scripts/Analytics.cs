@@ -14,7 +14,7 @@ namespace Areal.SDK {
         private static IPurchaseAnalyticsService[] _purchaseServices;
         private static IVirtualCurrencyAnalyticsService[] _virtualCurrencyServices;
 
-        public static void Init(params IAnalyticsService[] services) {
+        public static void SetServices(params IAnalyticsService[] services) {
             _customEventServices = services.OfType<ICustomEventAnalyticsService>().ToArray();
             _tutorialServices = services.OfType<ITutorialAnalyticsService>().ToArray();
             _levelUpServices = services.OfType<ILevelUpAnalyticsService>().ToArray();
