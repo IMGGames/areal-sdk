@@ -8,33 +8,7 @@ using DevToDev.Analytics;
 namespace Areal.SDK {
     public class DevToDev : ITutorialAnalyticsService, ICustomEventAnalyticsService, ILevelUpAnalyticsService, IPurchaseAnalyticsService,
         IVirtualCurrencyAnalyticsService {
-        // ReSharper disable UnusedParameter.Local
-        public DevToDev(
-            string androidAppId = null,
-            string iosAppId = null,
-            string webAppId = null,
-            string winAppId = null,
-            string osxAppId = null,
-            string uwpAppId = null) {
-            // ReSharper restore UnusedParameter.Local
-            // ReSharper disable once InlineTemporaryVariable
-            string token =
-#if UNITY_ANDROID
-                androidAppId;
-#elif UNITY_IOS
-                iosAppId;
-#elif UNITY_WEBGL
-                webAppId;
-#elif UNITY_STANDALONE_WIN
-                winAppId;
-#elif UNITY_STANDALONE_OSX
-                osxAppId;
-#elif UNITY_WSA
-                uwpAppId;
-#else
-                null;
-#endif
-
+        public DevToDev(string token) {
             if (token == null) {
                 throw new ArgumentException("No App ID provided for the current platform.");
             }
