@@ -8,6 +8,8 @@ namespace Areal.SDK.Healer {
     internal partial class HealerEditorWindow {
         private int _selectedCheckIndex;
 
+        private bool _messagesFoldout = true;
+
         private void DrawChecksPage() {
             const int sidebarMaxWidth = 200;
 
@@ -39,28 +41,34 @@ namespace Areal.SDK.Healer {
                 if (_checkMessages.TryGetValue(check, out var checkResults) && checkResults != null) {
                     Queue<int> unfixedChecks = new Queue<int>();
 
-                    for (var i = 0; i < checkResults.Length; i++) {
-                        var checkResult = checkResults[i];
+                    if (checkResults.Length > 0) {
+                        _messagesFoldout = EditorGUILayout.Foldout(_messagesFoldout, "Messages", true);
+                        
+                        for (var i = 0; i < checkResults.Length; i++) {
+                            var checkResult = checkResults[i];
 
-                        if (checkResult.Value == false) {
-                            unfixedChecks.Enqueue(i);
+                            if (checkResult.Value == false) {
+                                unfixedChecks.Enqueue(i);
+                            }
+
+                            if (_messagesFoldout) {
+                                GUILayout.Label($"{checkResult.Value}: {checkResult.Key.GetMessage()}");
+                            }
                         }
 
-                        GUILayout.Label($"{checkResult.Value}: {checkResult.Key.GetMessage()}");
-                    }
+                        if (unfixedChecks.Count > 0) {
+                            if (GUILayout.Button("Fix all")) {
+                                while (unfixedChecks.Count > 0) {
+                                    int index = unfixedChecks.Dequeue();
 
-                    if (unfixedChecks.Count > 0) {
-                        if (GUILayout.Button("Fix all")) {
-                            while (unfixedChecks.Count > 0) {
-                                int index = unfixedChecks.Dequeue();
-
-                                try {
-                                    var checkResult = checkResults[index].Key;
-                                    check.Instance.Fix(checkResult);
-                                    checkResults[index] = new(checkResult, true);
-                                }
-                                catch (Exception e) {
-                                    Debug.LogException(e);
+                                    try {
+                                        var checkResult = checkResults[index].Key;
+                                        check.Instance.Fix(checkResult);
+                                        checkResults[index] = new(checkResult, true);
+                                    }
+                                    catch (Exception e) {
+                                        Debug.LogException(e);
+                                    }
                                 }
                             }
                         }
