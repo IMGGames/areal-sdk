@@ -16,9 +16,9 @@ namespace Areal.SDK.Healer.Checks {
 
         public IEnumerable<ICheckResult> Check() {
             var results = AssetDatabase.FindAssets("t:Texture").Select(guid =>
-                (TextureImporter)AssetImporter.GetAtPath(AssetDatabase.GUIDToAssetPath(guid))
+                AssetImporter.GetAtPath(AssetDatabase.GUIDToAssetPath(guid)) as TextureImporter
             ).Where(importer => {
-                if (importer.textureType != TextureImporterType.Default || !importer.assetPath.ToLower().StartsWith("assets")) {
+                if (importer == null || importer.textureType != TextureImporterType.Default || !importer.assetPath.ToLower().StartsWith("assets")) {
                     return false;
                 }
 
