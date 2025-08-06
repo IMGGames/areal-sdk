@@ -1,0 +1,9 @@
+{
+  "name": "com.arealczech.sdk.applovin",
+  "version": "1.0.0",
+  "displayName": "Areal SDK AppLovin",
+  "unity": "2021.3",
+  "dependencies": {
+    "com.google.external-dependency-manager": "1.2.178"
+  }
+}
