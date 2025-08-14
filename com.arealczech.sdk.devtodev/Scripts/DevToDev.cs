@@ -10,7 +10,7 @@ namespace Areal.SDK {
         IVirtualCurrencyAnalyticsService {
         public DevToDev(string token) {
             if (token == null) {
-                throw new ArgumentException("No App ID provided for the current platform.");
+                throw new ArgumentNullException(nameof(token), "No App ID provided for the current platform.");
             }
 
             DTDAnalytics.Initialize(token);
