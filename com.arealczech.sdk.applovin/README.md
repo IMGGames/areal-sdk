@@ -9,7 +9,7 @@ https://github.com/IMGGames/areal-sdk.git?path=/com.arealczech.sdk.applovin
 ## Dependencies
 
 > [!IMPORTANT]
-> Add [AppLovin MAX](https://developers.axon.ai/en/max/unity/overview/integration/) before adding this package.
+> Install [AppLovin MAX](https://developers.axon.ai/en/max/unity/overview/integration/) before this package.
 
 > [!IMPORTANT]
 > Unity doesn't support git dependencies for packages, so you must install Areal SDK Common manually via Package Manager.
