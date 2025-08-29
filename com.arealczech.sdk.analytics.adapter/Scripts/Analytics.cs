@@ -89,14 +89,14 @@ namespace Areal.SDK {
             }
         }
 
-        public static void LogPurchaseInitiation(string productId) {
+        public static void LogPurchaseInitiation(string productId, string isoCurrencyCode, decimal price) {
             if (_purchaseServices is not { Length: > 0 }) {
                 Debug.LogWarning($"{Prefix} {nameof(LogPurchaseInitiation)}: no {nameof(IPurchaseAnalyticsService)} provided");
                 return;
             }
 
             foreach (var service in _purchaseServices) {
-                service.LogPurchaseInitiation(productId);
+                service.LogPurchaseInitiation(productId, isoCurrencyCode, price);
             }
         }
 
