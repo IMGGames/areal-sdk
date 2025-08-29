@@ -13,6 +13,7 @@ namespace Areal.SDK {
         private static ILevelUpAnalyticsService[] _levelUpServices;
         private static IPurchaseAnalyticsService[] _purchaseServices;
         private static IVirtualCurrencyAnalyticsService[] _virtualCurrencyServices;
+        private static ILoginAnalyticsService[] _loginAnalyticsServices;
 
         public static void SetServices(params IAnalyticsService[] services) {
             _customEventServices = services.OfType<ICustomEventAnalyticsService>().ToArray();
@@ -20,6 +21,7 @@ namespace Areal.SDK {
             _levelUpServices = services.OfType<ILevelUpAnalyticsService>().ToArray();
             _purchaseServices = services.OfType<IPurchaseAnalyticsService>().ToArray();
             _virtualCurrencyServices = services.OfType<IVirtualCurrencyAnalyticsService>().ToArray();
+            _loginAnalyticsServices = services.OfType<ILoginAnalyticsService>().ToArray();
         }
 
         public static void LogCustomEvent(string eventName, params (string key, object value)[] parameters) {
@@ -141,6 +143,17 @@ namespace Areal.SDK {
 
             foreach (var service in _virtualCurrencyServices) {
                 service.LogVirtualCurrencyPayment(purchaseId, purchaseCategory, purchaseAmount, resources);
+            }
+        }
+
+        public static void LogLogin() {
+            if (_loginAnalyticsServices is not { Length: > 0 }) {
+                Debug.LogWarning($"{Prefix} {nameof(LogLogin)}: no {nameof(ILoginAnalyticsService)} provided");
+                return;
+            }
+
+            foreach (var service in _loginAnalyticsServices) {
+                service.LogLogin();
             }
         }
     }
