@@ -67,7 +67,7 @@ namespace Areal.SDK {
             DTDAnalytics.LevelUp(level);
         }
 
-        public void LogPurchaseInitiation(string productId) {
+        public void LogPurchaseInitiation(string productId, string isoCurrencyCode, decimal price) {
             // ignored
         }
 
