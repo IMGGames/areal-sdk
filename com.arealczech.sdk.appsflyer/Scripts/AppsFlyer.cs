@@ -45,7 +45,7 @@ namespace Areal.SDK {
         }
 
         public void LogLevelUp(int level) {
-            AppsFlyerSDK.AppsFlyer.sendEvent(AFInAppEvents.LEVEL_ACHIEVED, new Dictionary<string, string> {{"af_level", level.ToString()}});
+            AppsFlyerSDK.AppsFlyer.sendEvent(AFInAppEvents.LEVEL_ACHIEVED, new Dictionary<string, string> {{AFInAppEvents.LEVEL, level.ToString()}});
         }
 
         public void LogPurchaseInitiation(string productId, string isoCurrencyCode, decimal price) {
