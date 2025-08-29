@@ -4,10 +4,13 @@ using System.Linq;
 using Areal.SDK.Common;
 using Areal.SDK.Common.Enums;
 using DevToDev.Analytics;
+using UnityEngine;
 
 namespace Areal.SDK {
     public class DevToDev : ITutorialAnalyticsService, ICustomEventAnalyticsService, ILevelUpAnalyticsService, IPurchaseAnalyticsService,
         IVirtualCurrencyAnalyticsService {
+        private const string Prefix = "[Areal SDK DevToDev]";
+        
         public DevToDev(string token) {
             if (token == null) {
                 throw new ArgumentNullException(nameof(token), "No App ID provided for the current platform.");
@@ -36,11 +39,16 @@ namespace Areal.SDK {
             var convertedParameters = new DTDCustomEventParameters();
 
             foreach ((string key, object value) in parameters) {
+                if (value == null) {
+                    Debug.LogWarning($"[{Prefix}] {eventName}: Parameter '{key}' has null value and was skipped");
+                    continue;
+                }
+                
                 switch (value) {
                     case byte or sbyte or short or ushort or int or uint or long or ulong:
                         convertedParameters.Add(key, Convert.ToInt64(value));
                         break;
-                    case double or float:
+                    case double or float or decimal:
                         convertedParameters.Add(key, Convert.ToDouble(value));
                         break;
                     case bool boolValue:
