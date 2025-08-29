@@ -31,8 +31,7 @@ namespace Areal.SDK.IAP {
 
         public static async Task Initialize(params IPurchaseHandler[] handlers) {
             if (State != InitializationState.Uninitialized) {
-                Debug.LogError(
-                    $"{nameof(IAPManager)} is {(State == InitializationState.Initialized ? "already initialized" : "already initializing")}");
+                Debug.LogError($"{nameof(IAPManager)} is {(State == InitializationState.Initialized ? "already initialized" : "already initializing")}");
                 return;
             }
 
@@ -65,8 +64,7 @@ namespace Areal.SDK.IAP {
                 builder.AddProducts(handlers.Select(e => new ProductDefinition(e.GetId(), (ProductType)e.GetEntryType())));
 
                 UnityPurchasing.Initialize(Listener, builder);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 OnInitializeFailed(e.ToString());
             }
         }
