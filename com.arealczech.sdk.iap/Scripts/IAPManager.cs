@@ -26,6 +26,7 @@ namespace Areal.SDK.IAP {
         public static InitializationState State { get; private set; } = InitializationState.Uninitialized;
         private static readonly Dictionary<string, Action<string>> Handlers = new Dictionary<string, Action<string>>();
 
+        public static event Action<Product> OnPurchaseInitiated;
         public static event Action<Product> OnPurchaseSucceeded;
         public static event Action OnInitialized;
 
@@ -76,10 +77,18 @@ namespace Areal.SDK.IAP {
                 throw new InvalidOperationException($"{nameof(IAPManager)} is not initialized yet");
             }
 
+            Product product = _controller.products.WithID(id);
+
             PayloadProvider.Set(id, payload);
             CurrentCallbacks[id] = callback;
 
-            _controller.InitiatePurchase(_controller.products.WithID(id));
+            try {
+                OnPurchaseInitiated?.Invoke(product);
+            } catch (Exception e) {
+                Debug.LogError(e);
+            }
+
+            _controller.InitiatePurchase(product);
         }
 
         private static PurchaseProcessingResult ProcessPurchase(Product product) {
@@ -94,7 +103,11 @@ namespace Areal.SDK.IAP {
                 CurrentCallbacks.Remove(id);
             }
 
-            OnPurchaseSucceeded?.Invoke(product);
+            try {
+                OnPurchaseSucceeded?.Invoke(product);
+            } catch (Exception e) {
+                Debug.LogError(e);
+            }
 
             return PurchaseProcessingResult.Complete;
         }
