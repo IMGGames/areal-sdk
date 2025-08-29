@@ -39,7 +39,7 @@ namespace Areal.SDK {
                 }
 
                 if (adUnits.Length <= 0) {
-                    throw new ArgumentException("At least one ad unit must be provided", nameof(adUnits));
+                    throw new ArgumentException("At least one ad unit must be provided.", nameof(adUnits));
                 }
 
                 if (State != InitializationState.Uninitialized) {

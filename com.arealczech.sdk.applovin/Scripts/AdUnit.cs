@@ -15,6 +15,8 @@ namespace Areal.SDK {
             _ => throw new ArgumentOutOfRangeException()
         };
 
+        public event Action<bool> OnReadyStateChanged;
+
         internal void Load() {
             switch (Type) {
                 case UnitType.Rewarded:
@@ -29,7 +31,12 @@ namespace Areal.SDK {
         }
 
         private int _loadAttempt;
-        internal void OnLoaded() => _loadAttempt = 0;
+
+        internal void OnLoaded() {
+            _loadAttempt = 0;
+            OnReadyStateChanged?.Invoke(true);
+        }
+
         internal void OnLoadFailed() => AppLovin.CallAfter(Mathf.Pow(2, Mathf.Min(6, _loadAttempt++)), Load);
 
         private Action<bool> _callback;
@@ -71,6 +78,8 @@ namespace Areal.SDK {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            
+            OnReadyStateChanged?.Invoke(false);
         }
 
         internal void OnRewardReceived() => CallbackAndReset(true);
