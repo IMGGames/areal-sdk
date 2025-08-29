@@ -7,11 +7,11 @@ namespace Areal.SDK.Common.Debug {
         IVirtualCurrencyAnalyticsService {
         private const string Prefix = "[" + nameof(DebugAnalytics) + "]";
 
-        public void LogCustomEvent(string eventName, params KeyValuePair<string, object>[] parameters) {
+        public void LogCustomEvent(string eventName, params (string key, object value)[] parameters) {
             string header = $"{Prefix} Custom event: {eventName}";
 
             if (parameters.Length > 0) {
-                header += "\n - " + string.Join("\n - ", parameters.Select(e => $"{e.Key}: {e.Value}"));
+                header += "\n - " + string.Join("\n - ", parameters.Select(e => $"{e.key}: {e.value}"));
             }
 
             UnityEngine.Debug.Log(header);
