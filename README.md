@@ -7,6 +7,7 @@ The goal of this project is to simplify integration of various SDKs. It provides
 ### Analytics
 -   [Static Adapter](./com.arealczech.sdk.analytics.adapter/)
 -   [DevToDev](./com.arealczech.sdk.devtodev/)
+-   [AppsFlyer](./com.arealczech.sdk.appsflyer/)
 
 ### Ads
 -   [AppLovin MAX](./com.arealczech.sdk.applovin/)
