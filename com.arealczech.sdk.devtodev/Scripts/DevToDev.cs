@@ -32,10 +32,10 @@ namespace Areal.SDK {
             DTDAnalytics.Tutorial(0);
         }
 
-        public void LogCustomEvent(string eventName, params KeyValuePair<string, object>[] parameters) {
+        public void LogCustomEvent(string eventName, params (string key, object value)[] parameters) {
             var convertedParameters = new DTDCustomEventParameters();
 
-            foreach (var (key, value) in parameters) {
+            foreach ((string key, object value) in parameters) {
                 switch (value) {
                     case byte or sbyte or short or ushort or int or uint or long or ulong:
                         convertedParameters.Add(key, Convert.ToInt64(value));
