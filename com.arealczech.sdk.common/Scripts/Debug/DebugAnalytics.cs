@@ -4,7 +4,7 @@ using Areal.SDK.Common.Enums;
 
 namespace Areal.SDK.Common.Debug {
     public class DebugAnalytics : ICustomEventAnalyticsService, ITutorialAnalyticsService, ILevelUpAnalyticsService, IPurchaseAnalyticsService,
-        IVirtualCurrencyAnalyticsService {
+        IVirtualCurrencyAnalyticsService, ILoginAnalyticsService {
         private const string Prefix = "[" + nameof(DebugAnalytics) + "]";
 
         public void LogCustomEvent(string eventName, params (string key, object value)[] parameters) {
@@ -80,6 +80,10 @@ namespace Areal.SDK.Common.Debug {
                 $"purchaseAmount='{purchaseAmount}', " +
                 $"resources:{FormatResources(resources)}"
             );
+        }
+
+        public void LogLogin() {
+            UnityEngine.Debug.Log($"{Prefix} Login");
         }
     }
 }
