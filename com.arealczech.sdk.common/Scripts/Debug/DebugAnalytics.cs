@@ -37,8 +37,13 @@ namespace Areal.SDK.Common.Debug {
             UnityEngine.Debug.Log($"{Prefix} Level up: {level}");
         }
 
-        public void LogPurchaseInitiation(string productId) {
-            UnityEngine.Debug.Log($"{Prefix} Purchase initiation: {productId}");
+        public void LogPurchaseInitiation(string productId, string isoCurrencyCode, decimal price) {
+            UnityEngine.Debug.Log(
+                $"{Prefix} Purchase initiation: " +
+                $"productId='{productId}', " +
+                $"isoCurrencyCode='{isoCurrencyCode}', " +
+                $"price='{price}'"
+            );
         }
 
         public void LogPurchase(string productId, string transactionId, string isoCurrencyCode, decimal price) {
