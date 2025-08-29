@@ -22,7 +22,7 @@ namespace Areal.SDK {
             _virtualCurrencyServices = services.OfType<IVirtualCurrencyAnalyticsService>().ToArray();
         }
 
-        public static void LogCustomEvent(string eventName, params KeyValuePair<string, object>[] parameters) {
+        public static void LogCustomEvent(string eventName, params (string key, object value)[] parameters) {
             if (_customEventServices is not { Length: > 0 }) {
                 Debug.LogWarning($"{Prefix} {nameof(LogCustomEvent)}: no {nameof(ICustomEventAnalyticsService)} provided");
                 return;

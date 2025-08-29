@@ -1,6 +1,6 @@
 {
   "name": "com.arealczech.sdk.analytics.adapter",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "displayName": "Areal SDK Analytics Adapter",
   "unity": "2021.3"
 }
