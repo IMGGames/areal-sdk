@@ -11,12 +11,12 @@ namespace Areal.SDK {
         IVirtualCurrencyAnalyticsService {
         private const string Prefix = "[Areal SDK DevToDev]";
         
-        public DevToDev(string token) {
-            if (token == null) {
-                throw new ArgumentNullException(nameof(token), "No App ID provided for the current platform.");
+        public DevToDev(string appKey) {
+            if (appKey == null) {
+                throw new ArgumentNullException(nameof(appKey), "No App Key provided.");
             }
 
-            DTDAnalytics.Initialize(token);
+            DTDAnalytics.Initialize(appKey);
         }
 
         public void LogTutorialStart() {
