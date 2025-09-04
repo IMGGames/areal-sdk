@@ -1,6 +1,6 @@
 {
   "name": "com.arealczech.sdk.appsflyer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "Areal SDK AppsFlyer",
   "unity": "2021.3",
   "dependencies": {

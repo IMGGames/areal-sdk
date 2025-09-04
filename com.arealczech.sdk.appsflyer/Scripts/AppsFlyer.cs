@@ -5,7 +5,7 @@ using Areal.SDK.Common;
 using UnityEngine;
 
 namespace Areal.SDK {
-    public class AppsFlyer : ICustomEventAnalyticsService, IPurchaseAnalyticsService, ILevelUpAnalyticsService, ILoginAnalyticsService {
+    public class AppsFlyer : ICustomEventAnalyticsService, IPurchaseAnalyticsService, ILevelUpAnalyticsService, ILoginAnalyticsService, ITutorialAnalyticsService {
         private const string Prefix = "[Areal SDK AppsFlyer]";
 
         public AppsFlyer(string devKey, string appId, bool debugMode = false) {
@@ -45,14 +45,14 @@ namespace Areal.SDK {
         }
 
         public void LogLevelUp(int level) {
-            AppsFlyerSDK.AppsFlyer.sendEvent(AFInAppEvents.LEVEL_ACHIEVED, new Dictionary<string, string> {{AFInAppEvents.LEVEL, level.ToString()}});
+            AppsFlyerSDK.AppsFlyer.sendEvent(AFInAppEvents.LEVEL_ACHIEVED, new Dictionary<string, string> { { AFInAppEvents.LEVEL, level.ToString() } });
         }
 
         public void LogPurchaseInitiation(string productId, string isoCurrencyCode, decimal price) {
             AppsFlyerSDK.AppsFlyer.sendEvent(AFInAppEvents.INITIATED_CHECKOUT, new Dictionary<string, string> {
                 { AFInAppEvents.CURRENCY, isoCurrencyCode },
                 { AFInAppEvents.PRICE, price.ToString(CultureInfo.InvariantCulture) },
-                { AFInAppEvents.CONTENT_ID, productId }, 
+                { AFInAppEvents.CONTENT_ID, productId }
             });
         }
 
@@ -61,12 +61,32 @@ namespace Areal.SDK {
                 { AFInAppEvents.CURRENCY, isoCurrencyCode },
                 { AFInAppEvents.REVENUE, price.ToString(CultureInfo.InvariantCulture) },
                 { AFInAppEvents.ORDER_ID, transactionId },
-                { AFInAppEvents.CONTENT_ID, productId }, 
+                { AFInAppEvents.CONTENT_ID, productId }
             });
         }
 
         public void LogLogin() {
             AppsFlyerSDK.AppsFlyer.sendEvent(AFInAppEvents.LOGIN, new Dictionary<string, string>());
+        }
+
+        public void LogTutorialStart() {
+            // ignored
+        }
+
+        public void LogTutorialStep(int step) {
+            // ignored
+        }
+
+        public void LogTutorialFinish() {
+            AppsFlyerSDK.AppsFlyer.sendEvent(AFInAppEvents.TUTORIAL_COMPLETION, new Dictionary<string, string> {
+                { AFInAppEvents.SUCCESS, "true" }
+            });
+        }
+
+        public void LogTutorialSkipped() {
+            AppsFlyerSDK.AppsFlyer.sendEvent(AFInAppEvents.TUTORIAL_COMPLETION, new Dictionary<string, string> {
+                { AFInAppEvents.SUCCESS, "false" }
+            });
         }
     }
 }
