@@ -2,5 +2,6 @@
   "name": "com.arealczech.sdk.devtodev",
   "version": "1.0.5",
   "displayName": "Areal SDK DevToDev",
+  "author": "Denis Komarkov",
   "unity": "2021.3"
 }
