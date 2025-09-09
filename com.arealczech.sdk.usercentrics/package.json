@@ -1,0 +1,8 @@
+{
+  "name": "com.arealczech.sdk.usercentrics",
+  "version": "1.0.0",
+  "displayName": "Areal SDK Usercentrics",
+  "author": "Denis Komarkov",
+  "unity": "2021.3",
+  "dependencies": {}
+}
