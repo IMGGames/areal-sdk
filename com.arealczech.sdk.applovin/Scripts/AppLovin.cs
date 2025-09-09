@@ -30,7 +30,7 @@ namespace Areal.SDK {
         private static bool _maxSdkCallbackInitializedSet;
         private static TaskCompletionSource<bool> _initializeTaskCompletionSource;
 
-        public static Task<bool> Initialize(params AdUnit[] adUnits) {
+        public static Task<bool> Initialize(bool? userConsent, bool? doNotSell, params AdUnit[] adUnits) {
             var tcs = new TaskCompletionSource<bool>();
 
             try {
@@ -61,6 +61,14 @@ namespace Areal.SDK {
                     MaxSdkCallbacks.OnSdkInitializedEvent += OnInitialized;
                 }
 
+                if (userConsent.HasValue) {
+                    MaxSdk.SetHasUserConsent(userConsent.Value);
+                }
+
+                if (doNotSell.HasValue) {
+                    MaxSdk.SetDoNotSell(doNotSell.Value);
+                }
+
                 MaxSdk.InitializeSdk();
             } catch (Exception e) {
                 tcs.SetException(e);
@@ -83,7 +91,7 @@ namespace Areal.SDK {
             foreach (var unit in _rewardedUnits) {
                 unit.Load();
             }
-            
+
             foreach (var unit in _interstitialUnits) {
                 unit.Load();
             }
