@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using AppsFlyerSDK;
 using Areal.SDK.Common;
 using UnityEngine;
 
@@ -8,7 +9,14 @@ namespace Areal.SDK {
     public class AppsFlyer : ICustomEventAnalyticsService, IPurchaseAnalyticsService, ILevelUpAnalyticsService, ILoginAnalyticsService, ITutorialAnalyticsService {
         private const string Prefix = "[Areal SDK AppsFlyer]";
 
-        public AppsFlyer(string devKey, string appId, bool debugMode = false) {
+        public AppsFlyer(
+            string devKey,
+            string appId,
+            bool debugMode = false,
+            bool? isUserSubjectToGdpr = null,
+            bool? hasConsentForDataUsage = null,
+            bool? hasConsentForAdsPersonalization = null,
+            bool? hasConsentForAdStorage = null) {
             if (devKey == null) {
                 throw new ArgumentNullException(nameof(devKey), "Dev Key not provided.");
             }
@@ -18,6 +26,7 @@ namespace Areal.SDK {
             }
 
             AppsFlyerSDK.AppsFlyer.setIsDebug(debugMode);
+            AppsFlyerSDK.AppsFlyer.setConsentData(new AppsFlyerConsent(isUserSubjectToGdpr, hasConsentForDataUsage, hasConsentForAdsPersonalization, hasConsentForAdStorage));
             AppsFlyerSDK.AppsFlyer.initSDK(devKey, appId);
             AppsFlyerSDK.AppsFlyer.startSDK();
         }
