@@ -1,7 +1,9 @@
 {
     "name": "Areal SDK Usercentrics",
     "rootNamespace": "Areal.SDK",
-    "references": [],
+    "references": [
+        "GUID:84290b801f0ff428d8636cf70aca6c76"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
