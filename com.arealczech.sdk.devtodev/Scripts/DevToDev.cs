@@ -16,7 +16,12 @@ namespace Areal.SDK {
                 throw new ArgumentNullException(nameof(appKey), "No App Key provided.");
             }
 
-            DTDAnalytics.Initialize(appKey);
+            DTDAnalytics.Initialize(appKey, new DTDAnalyticsConfiguration {
+                ApplicationVersion = Application.version,
+                LogLevel = DTDLogLevel.Warning,
+                TrackingAvailability = DTDTrackingStatus.Enable,
+                UserId = SystemInfo.deviceUniqueIdentifier
+            });
         }
 
         public void LogTutorialStart() {
