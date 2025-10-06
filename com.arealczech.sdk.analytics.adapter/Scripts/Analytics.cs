@@ -14,6 +14,7 @@ namespace Areal.SDK {
         private static IPurchaseAnalyticsService[] _purchaseServices;
         private static IVirtualCurrencyAnalyticsService[] _virtualCurrencyServices;
         private static ILoginAnalyticsService[] _loginAnalyticsServices;
+        private static IProgressionAnalyticsService[] _progressionAnalyticsServices;
 
         public static void SetServices(params IAnalyticsService[] services) {
             _customEventServices = services.OfType<ICustomEventAnalyticsService>().ToArray();
@@ -22,6 +23,7 @@ namespace Areal.SDK {
             _purchaseServices = services.OfType<IPurchaseAnalyticsService>().ToArray();
             _virtualCurrencyServices = services.OfType<IVirtualCurrencyAnalyticsService>().ToArray();
             _loginAnalyticsServices = services.OfType<ILoginAnalyticsService>().ToArray();
+            _progressionAnalyticsServices = services.OfType<IProgressionAnalyticsService>().ToArray();
         }
 
         public static void LogCustomEvent(string eventName, params (string key, object value)[] parameters) {
@@ -154,6 +156,28 @@ namespace Areal.SDK {
 
             foreach (var service in _loginAnalyticsServices) {
                 service.LogLogin();
+            }
+        }
+
+        public static void LogStartProgression(string eventName, string source) {
+            if (_progressionAnalyticsServices is not { Length: > 0 }) {
+                Debug.LogWarning($"{Prefix} {nameof(LogStartProgression)}: no {nameof(IProgressionAnalyticsService)} provided");
+                return;
+            }
+
+            foreach (var service in _progressionAnalyticsServices) {
+                service.LogStartProgression(eventName, source);
+            }
+        }
+
+        public static void LogFinishProgression(string eventName, bool successful = true) {
+            if (_progressionAnalyticsServices is not { Length: > 0 }) {
+                Debug.LogWarning($"{Prefix} {nameof(LogFinishProgression)}: no {nameof(IProgressionAnalyticsService)} provided");
+                return;
+            }
+
+            foreach (var service in _progressionAnalyticsServices) {
+                service.LogFinishProgression(eventName, successful);
             }
         }
     }
