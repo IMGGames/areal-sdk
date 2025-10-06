@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace Areal.SDK {
     public class DevToDev : ITutorialAnalyticsService, ICustomEventAnalyticsService, ILevelUpAnalyticsService, IPurchaseAnalyticsService,
-        IVirtualCurrencyAnalyticsService {
+        IVirtualCurrencyAnalyticsService, IProgressionAnalyticsService {
         private const string Prefix = "[Areal SDK DevToDev]";
-        
+
         public DevToDev(string appKey) {
             if (appKey == null) {
                 throw new ArgumentNullException(nameof(appKey), "No App Key provided.");
@@ -48,7 +48,7 @@ namespace Areal.SDK {
                     Debug.LogWarning($"[{Prefix}] {eventName}: Parameter '{key}' has null value and was skipped");
                     continue;
                 }
-                
+
                 switch (value) {
                     case byte or sbyte or short or ushort or int or uint or long or ulong:
                         convertedParameters.Add(key, Convert.ToInt64(value));
@@ -105,6 +105,14 @@ namespace Areal.SDK {
                 purchaseAmount,
                 resources.ToDictionary(e => e.Key, e => (int)e.Value)
             );
+        }
+
+        public void LogStartProgression(string eventName, string source) {
+            DTDAnalytics.StartProgressionEvent(eventName, new DTDStartProgressionEventParameters { Source = source });
+        }
+
+        public void LogFinishProgression(string eventName, bool successful = true) {
+            DTDAnalytics.FinishProgressionEvent(eventName, new DTDFinishProgressionEventParameters { SuccessfulCompletion = successful });
         }
     }
 }
