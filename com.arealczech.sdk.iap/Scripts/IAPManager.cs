@@ -138,9 +138,13 @@ namespace Areal.SDK.IAP {
             string id = product.definition.id;
 
             PayloadProvider.Remove(id);
-            CurrentCallbacks.Remove(id);
+            if (CurrentCallbacks.TryGetValue(id, out var callback)) {
+                callback?.Invoke(PurchaseResult.Failed);
+                CurrentCallbacks.Remove(id);
+            }
 
             Debug.LogError($"Purchasing {id} failed: {message}");
+
         }
 
         private static IStoreController _controller;

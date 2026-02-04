@@ -1,6 +1,6 @@
 {
   "name": "com.arealczech.sdk.iap",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "displayName": "Areal SDK IAP",
   "author": "Denis Komarkov",
   "unity": "2021.3",
